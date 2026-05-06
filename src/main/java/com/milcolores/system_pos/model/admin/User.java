@@ -31,7 +31,6 @@ public class User {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @NotBlank
     @Enumerated(EnumType.STRING)
     private Role role;
 
