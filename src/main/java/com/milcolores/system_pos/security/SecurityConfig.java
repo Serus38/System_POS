@@ -30,21 +30,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/save")
+                .requestMatchers("/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health")
                 .permitAll()
-                .requestMatchers(
-                    "/v3/api-docs/**",
-					"/api-docs/**",
-					"/swagger-ui/**",
-					"/swagger-ui.html",
-					"/actuator/health"
-                )
+                .anyRequest()
                 .permitAll()
-                .requestMatchers("/users/**")
-                .authenticated()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
+            );
         return http.build();
 
     }
@@ -68,7 +58,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.milcolores.system_pos.dto.user.UserRequest;
+import com.milcolores.system_pos.dto.user.UserRequestDto;
 import com.milcolores.system_pos.dto.user.UserResponse;
+import com.milcolores.system_pos.exception.InvalidRoleException;
 import com.milcolores.system_pos.exception.ResourceNotFound;
+import com.milcolores.system_pos.mapper.UserMapper;
 import com.milcolores.system_pos.model.admin.User;
 import com.milcolores.system_pos.repository.UserRepository;
-import com.milcolores.system_pos.util.TextFormatter;
+import com.milcolores.system_pos.util.SanitizerUtil;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -27,29 +29,31 @@ public class UserServiceImp implements UserService {
     @Override
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::mapToResponse)
+                .map(UserMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public User getUserById(Long id) {
-        User user = userRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("User not found with id: " + id));
-        return user;
     }
 
     @Override
-    public UserResponse save(UserRequest dto) {
+    public UserResponse save(UserRequestDto dto) {
+        validateRole(dto.role());
+
         User user = new User();
-        user.setName(TextFormatter.formatName(dto.name()));
-        user.setUsername(TextFormatter.cleanUsername(dto.username()));
-        user.setNit(TextFormatter.cleanIdentifier(dto.nit()));
+        user.setName(SanitizerUtil.capitalizeName(dto.name()));
+        user.setUsername(SanitizerUtil.cleanUsername(dto.username()));
+        user.setNit(SanitizerUtil.digitsOnly(dto.nit()));
         user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setEmail(dto.email().toLowerCase().trim());
+        user.setEmail(SanitizerUtil.normalizeEmail(dto.email()));
         user.setRole(dto.role());
         user.setIsActive(true);
+
         User savedUser = userRepository.save(user);
-        return mapToResponse(savedUser);
+        return UserMapper.toResponse(savedUser);
     }
 
     @Override
@@ -58,31 +62,29 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponse update(Long id, UserRequest dto) {
+    public UserResponse update(Long id, UserRequestDto dto) {
+        validateRole(dto.role());
+
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("User not found with id: " + id));
-        existingUser.setName(TextFormatter.formatName(dto.name()));
-        existingUser.setUsername(TextFormatter.cleanUsername(dto.username()));
-        existingUser.setNit(TextFormatter.cleanIdentifier(dto.nit()));
-        existingUser.setEmail(dto.email().toLowerCase().trim());
+
+        existingUser.setName(SanitizerUtil.capitalizeName(dto.name()));
+        existingUser.setUsername(SanitizerUtil.cleanUsername(dto.username()));
+        existingUser.setNit(SanitizerUtil.digitsOnly(dto.nit()));
+        existingUser.setEmail(SanitizerUtil.normalizeEmail(dto.email()));
         existingUser.setRole(dto.role());
+
         if (dto.password() != null && !dto.password().isBlank()) {
             existingUser.setPassword(passwordEncoder.encode(dto.password()));
         }
-        return mapToResponse(userRepository.save(existingUser));
+
+        User updatedUser = userRepository.save(existingUser);
+        return UserMapper.toResponse(updatedUser);
     }
 
-    private UserResponse mapToResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getName(),
-                user.getRole(),
-                user.getUsername(),
-                user.getNit(),
-                user.getEmail(),
-                user.getIsActive(),
-                user.getLastLoginAt()
-        );
+    private void validateRole(Object role) {
+        if (role == null) {
+            throw new InvalidRoleException("Rol inválido. Los valores permitidos son: ADMIN, EMPLOYEE");
+        }
     }
-
 }
