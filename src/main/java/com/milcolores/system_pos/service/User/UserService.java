@@ -4,18 +4,20 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.milcolores.system_pos.dto.user.UserRequest;
+import com.milcolores.system_pos.dto.user.UserResponse;
 import com.milcolores.system_pos.model.admin.User;
 
 @Service
 public interface UserService {
 
-    List<User> getAllUsers();
+    List<UserResponse> getAllUsers();
 
     User getUserById(Long id);
 
-    User save(User user);
+    UserResponse save(UserRequest dto);
 
     void delete(Long id);
 
-    User update(User user);
+    UserResponse update(Long id, UserRequest dto);
 }

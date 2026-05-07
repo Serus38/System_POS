@@ -2,12 +2,13 @@ package com.milcolores.system_pos.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.milcolores.system_pos.dto.user.UserRequest;
+import com.milcolores.system_pos.dto.user.UserResponse;
 import com.milcolores.system_pos.model.admin.User;
 import com.milcolores.system_pos.service.User.UserService;
 
@@ -29,8 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "User", description = "Endpoints for managing users")
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/getAll")
     @Operation(summary = "Get all users", description = "Returns a list of all users")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -50,8 +50,8 @@ public class UserController {
 
     @PostMapping("/save")
     @Operation(summary = "Save a new user", description = "Creates a new user") 
-    public ResponseEntity<User> saveUser(@Valid @RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
+    public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequest dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(dto));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -63,10 +63,9 @@ public class UserController {
 
     @PutMapping("/edit/{id}")
     @Operation(summary = "Update a user by ID", description = "Updates a single user by their ID")
-    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody User user) {
-        user.setId(id);
-        userService.update(user);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserRequest dto) {
+        UserResponse updatedUser = userService.update(id, dto);
+        return ResponseEntity.ok(updatedUser);
     }
 
 }
