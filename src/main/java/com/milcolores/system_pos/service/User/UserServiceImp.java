@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.milcolores.system_pos.dto.user.UserRequestDto;
+import com.milcolores.system_pos.dto.user.UserRequest;
 import com.milcolores.system_pos.dto.user.UserResponse;
 import com.milcolores.system_pos.exception.InvalidRoleException;
 import com.milcolores.system_pos.exception.ResourceNotFound;
@@ -40,7 +40,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponse save(UserRequestDto dto) {
+    public UserResponse save(UserRequest dto) {
         validateRole(dto.role());
 
         User user = new User();
@@ -62,7 +62,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponse update(Long id, UserRequestDto dto) {
+    public UserResponse update(Long id, UserRequest dto) {
         validateRole(dto.role());
 
         User existingUser = userRepository.findById(id)

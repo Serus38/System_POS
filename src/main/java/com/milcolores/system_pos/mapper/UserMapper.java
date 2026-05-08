@@ -1,12 +1,12 @@
 package com.milcolores.system_pos.mapper;
 
-import com.milcolores.system_pos.dto.user.UserRequestDto;
+import com.milcolores.system_pos.dto.user.UserRequest;
 import com.milcolores.system_pos.dto.user.UserResponse;
 import com.milcolores.system_pos.model.admin.User;
 
 public class UserMapper {
 
-    public static User toEntity(UserRequestDto dto) {
+    public static User toEntity(UserRequest dto) {
         User user = new User();
         user.setName(dto.name());
         user.setUsername(dto.username());

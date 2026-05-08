@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.milcolores.system_pos.dto.user.UserRequestDto;
+import com.milcolores.system_pos.dto.user.UserRequest;
 import com.milcolores.system_pos.dto.user.UserResponse;
 import com.milcolores.system_pos.model.admin.User;
 import com.milcolores.system_pos.service.User.UserService;
@@ -50,7 +50,7 @@ public class UserController {
 
     @PostMapping("/save")
     @Operation(summary = "Save a new user", description = "Creates a new user with encryption and normalization")
-    public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequestDto dto) {
+    public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequest dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(dto));
     }
 
@@ -63,7 +63,7 @@ public class UserController {
 
     @PutMapping("/edit/{id}")
     @Operation(summary = "Update a user by ID", description = "Updates a single user by their ID with encryption and normalization")
-    public ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserRequestDto dto) {
+    public ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserRequest dto) {
         UserResponse updatedUser = userService.update(id, dto);
         return ResponseEntity.ok(updatedUser);
     }
