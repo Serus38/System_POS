@@ -8,7 +8,7 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.milcolores</groupId>
+	<groupId>com.system</groupId>
 	<artifactId>system_pos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>system_pos</name>
